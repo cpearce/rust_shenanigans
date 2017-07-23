@@ -41,6 +41,46 @@ fn quick_sort(v: &mut [i32]) {
     quick_sort(&mut v[i ..]);
 }
 
+fn merge(v: &mut [i32], tmp: &mut [i32]) {
+    for (index, value) in v.iter().enumerate() {
+        tmp[index] = *value;
+    }
+    let mut left : usize = 0;
+    let mut right : usize = v.len() / 2;
+    let mut index : usize = 0;
+    while left < v.len() / 2 && right != v.len() {
+        if tmp[left] < tmp[right] {
+            v[index] = tmp[left];
+            left += 1;
+        } else {
+            v[index] = tmp[right];
+            right += 1;
+        }
+        index += 1;
+    }
+    while left < v.len() / 2 {
+        v[index] = tmp[left];
+        index += 1;
+        left += 1;
+    }
+}
+
+fn merge_sort_(v: &mut [i32], tmp: &mut [i32]) {
+    let mid = v.len() / 2;
+    if mid > 0 {
+        merge_sort_(&mut v[0..mid], &mut tmp[0..mid]);
+    }
+    if mid + 1 < v.len() {
+        merge_sort_(&mut v[mid..], &mut tmp[mid..]);
+    }
+    merge(v, tmp);
+}
+
+fn merge_sort(v: &mut [i32]) {
+    let mut tmp = v.to_vec();
+    merge_sort_(v, &mut tmp);
+}
+
 fn binsearch(v: &[i32], target: i32) -> Result<usize,usize> {
     let mut lo = 0;
     let mut hi = v.len();
@@ -66,7 +106,8 @@ fn main() {
     for _ in 0..100 {
         let mut v = random_vec();
         let target = v[0];
-        quick_sort(&mut v);
+        // quick_sort(&mut v);
+        merge_sort(&mut v);
         assert!(is_sorted(&v));
         let i = binsearch(&v, target).unwrap();
         assert!(v[i] == target);
